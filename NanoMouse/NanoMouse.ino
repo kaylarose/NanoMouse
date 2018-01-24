@@ -89,6 +89,7 @@ void turn(int direction, int degrees) {
   // so if we give multiplier directional args (-1/1) the bot should know hich way to turn.
   leftServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
   rightServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
+  // TODO Kayla: Refactor this bot https://www.youtube.com/watch?v=5R59dDwAeco
   if (direction == RIGHT_DIRECTION) {
     delay(degrees*4.9);
   } else {
@@ -124,12 +125,12 @@ void spiral() {
   DPRINTLN("Starting Spiral...");
    for (int i=0; i <= 4; i++){
     DPRINTLN("Spiral step: "+i);
-//    move(500*i, 500*i);
-//    delay(1000);
-    move(0+(i*100), 500*i);
-    delay(1000);
+    move(500*i, 500*i);
+   delay(1000);
+   move(0, 250*i);
+   delay(1700);
    }
-  DPRINTLN("Completed spiral...");
+  DPRINTLN("Completed spiralare...");
 }
 
 void blinkTest() {

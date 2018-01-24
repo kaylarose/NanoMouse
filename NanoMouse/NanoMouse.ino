@@ -100,6 +100,16 @@ void turn(int direction, int degrees) {
 }
 
 
+
+void move(int leftMotor, int rightMotor) {
+  DPRINTLN((String)"Moving..."+"L:"+leftMotor+" "+"R:"+rightMotor);
+  // Because we are using an normal int here, the value is max 32 sec (-32k/+32k), 
+  // so if we give multiplier directional args (-1/1) the bot should know hich way to turn.
+  leftServo.writeMicroseconds(1500-leftMotor);
+  rightServo.writeMicroseconds(1500+rightMotor);
+  DPRINTLN((String)"Moved..."+"L:"+leftMotor+" "+"R:"+rightMotor);
+}
+
 void square() {
   DPRINTLN("Starting Square...");
    for (int i=0; i <= 4; i++){
@@ -123,4 +133,9 @@ void blinkTest() {
 void loop() {
   // blinkTest();
    square();
+   move(500, 500);
+   delay(1000);
+      move(0, 500);
+   delay(1700);
+
 }

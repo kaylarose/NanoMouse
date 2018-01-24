@@ -90,7 +90,11 @@ void turn(int direction, int degrees) {
   leftServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
   rightServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
   // TODO Kayla: Refactor this bot https://www.youtube.com/watch?v=5R59dDwAeco
-  delay(degrees*5.9);
+  if (direction == RIGHT_DIRECTION) {
+    delay(degrees*4.9);
+  } else {
+    delay(degrees*5.9);
+  }
   stop();
   DPRINTLN("Turned..."+degrees);
 }
@@ -98,21 +102,12 @@ void turn(int direction, int degrees) {
 
 void square() {
   DPRINTLN("Starting Square...");
-  forwardTime(1500);
-  turn(LEFT_DIRECTION, 90);
-  delay(200);
-  DPRINTLN("L1 Square...");
-  forwardTime(1500);
-  turn(LEFT_DIRECTION, 90);
-  delay(200);
-   DPRINTLN("L2 Square...");
-  forwardTime(1500);
-  turn(LEFT_DIRECTION, 90);
-  delay(200);
-  DPRINTLN("L3 Square...");
-  forwardTime(1500);
-  turn(LEFT_DIRECTION, 90);
-  delay(200);
+   for (int i=0; i <= 4; i++){
+    DPRINTLN("Square step: "+i);
+    forwardTime(1500);
+    turn(LEFT_DIRECTION, 90);
+    delay(200);
+   }
   DPRINTLN("Completed Square...");
 }
 

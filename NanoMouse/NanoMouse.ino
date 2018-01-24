@@ -123,12 +123,12 @@ void square() {
 
 void spiral() {
   DPRINTLN("Starting Spiral...");
-   for (int i=0; i <= 4; i++){
+   for (int i=0; i <= 6; i++){
     DPRINTLN("Spiral step: "+i);
-    move(500*i, 500*i);
-   delay(1000);
-   move(0, 250*i);
-   delay(1700);
+    move(100+(i*+10), 500*(i+1));
+   delay(500*i+1);
+//   move(0, 250*i);
+//   delay(1700);
    }
   DPRINTLN("Completed spiralare...");
 }

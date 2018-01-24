@@ -17,7 +17,7 @@ Servo rightServo;
 
 const byte  LEFT_SERVO_PIN = 6;
 const byte  RIGHT_SERVO_PIN = 5;
-const byte  SERVO_POWER_LEVEL = 250; // 200 is max
+const byte  SERVO_POWER_LEVEL = 200; // 200 is max
 // The Breadboard Button
 const byte  BUTTON_PIN = 9;
 
@@ -27,11 +27,6 @@ void setup() {
   leftServo.attach(LEFT_SERVO_PIN);
   rightServo.attach(RIGHT_SERVO_PIN);
 
-  // Sends "Stop" Pulse in 1500 Microseconds
-  // Used for calibration. May need to rerun.
-  //  leftServo.writeMicroseconds(1500);
-  //  rightServo.writeMicroseconds(1500);
-
   // Uncomment for enabling Blink Test Mode.
    pinMode(LED_BUILTIN, OUTPUT);
 
@@ -40,18 +35,8 @@ void setup() {
   pinMode(BUTTON_PIN, INPUT_PULLUP);
 
   while(digitalRead(BUTTON_PIN)) {
-  
+    // no-op
   }
-
-  //forwardTime(5000 );
-  //delay(1000);
-  //stop();
-//  turn(LEFT_DIRECTION, 500);
-//  turn(RIGHT_DIRECTION, 500);
-//   square();
-//   //stop(200);
-  //  square();
-  //   blinkTest();
 }
 
 
@@ -66,11 +51,11 @@ void setup() {
 
 
 void stop() {
-DPRINTLN("Stopping...");
-// Sends "Stop" Pulse in 1500 Microseconds
-leftServo.writeMicroseconds(1500);
-rightServo.writeMicroseconds(1500);
-DPRINTLN("Stopped with time...");
+  DPRINTLN("Stopping...");
+  // Sends "Stop" Pulse in 1500 Microseconds
+  leftServo.writeMicroseconds(1500);
+  rightServo.writeMicroseconds(1500);
+  DPRINTLN("Stopped with time...");
 }
 
 
@@ -79,7 +64,7 @@ void forward() {
   leftServo.writeMicroseconds(1500-SERVO_POWER_LEVEL);
   // Inverse power because the servo motor is a different orientation
   // Protip: seems to only apply to parallax motors. Kit motors are pre-calibrated
-    // Max 1500...otherwise is reverse......????
+  // Max 1500...otherwise is reverse......????
   // unsigned int would Go up to max 65k secs (0k/+~65k)
   // signed int would Go up to max 32 (32 bit int) seconds (-32k/+32k)
   // https://www.youtube.com/watch?v=dke4o7A2Y44&feature=youtu.be
@@ -105,44 +90,31 @@ void turn(int direction, int degrees) {
   leftServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
   rightServo.writeMicroseconds(1500+SERVO_POWER_LEVEL*direction);
   // TODO Kayla: Refactor this bot https://www.youtube.com/watch?v=5R59dDwAeco
-  delay(degrees*5);
+  delay(degrees*5.9);
   stop();
   DPRINTLN("Turned..."+degrees);
 }
 
+
 void square() {
   DPRINTLN("Starting Square...");
-  //forward();
   forwardTime(1500);
-  delay(1500);
-  //stop(1000);
-//  DPRINTLN("L1 Square...");
-   turn(LEFT_DIRECTION, 425);
-   //delay(1000);
-//  //forward();
-   forwardTime(1500);
-     delay(1500);
-
-//  //stop(1000);
+  turn(LEFT_DIRECTION, 90);
+  delay(200);
+  DPRINTLN("L1 Square...");
+  forwardTime(1500);
+  turn(LEFT_DIRECTION, 90);
+  delay(200);
    DPRINTLN("L2 Square...");
-   turn(LEFT_DIRECTION, 425);
-//  //stop(1000);
-//  //forward();
-    forwardTime(1500);
-    delay(1500);
-//  //stop(1000);
+  forwardTime(1500);
+  turn(LEFT_DIRECTION, 90);
+  delay(200);
   DPRINTLN("L3 Square...");
-    turn(LEFT_DIRECTION, 425);
-//  //stop(1000);
-//  //forward();  
-//    forwardTime(1500);
-//    delay(1500);
-//
-//  //stop(1000);
-  //forwardTime(1000);
+  forwardTime(1500);
+  turn(LEFT_DIRECTION, 90);
+  delay(200);
   DPRINTLN("Completed Square...");
 }
-
 
 void blinkTest() {
   DPRINTLN("Blink Board...");
@@ -154,10 +126,6 @@ void blinkTest() {
 }
 
 void loop() {
-  //forward();
-  // Uncomment for enabling Blink Test Mode.
   // blinkTest();
    square();
-   //forwardTime(1500);
-   //forward();
 }

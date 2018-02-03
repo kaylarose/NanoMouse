@@ -1,0 +1,7 @@
+{
+  "sketch": "NanoMouse.ino",
+  "port": "COM5",
+  "board": "Arduino Nano",
+  "output": "../nano_build",
+  "debugger": "jlink"
+}

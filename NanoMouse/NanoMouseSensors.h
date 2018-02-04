@@ -4,14 +4,16 @@
 template <byte frontDetector, byte leftDetector, byte rightDetector>
 
 class NanoMouseSensors {
-  public: 
+  public:
     void view() {
-      DPRINTLN("IR Sensors...");
-      //DPRINTLN("F:");
-      //DPRINTLN(analogRead(frontDetector));
-      //DPRINTLN("L:");
+      //DPRINTLN("IR Sensors...");
+      DPRINT("Front: ");
+      //Serial.print(analogRead(frontDetector));
+      DPRINTLN(analogRead(frontDetector));
+      //DPRINT("Left: ");
       //DPRINTLN(analogRead(leftDetector));
-      DPRINTLN("R:");
-      DPRINTLN(analogRead(rightDetector));
+      //DPRINT("Right: ");
+      //DPRINTLN(analogRead(rightDetector));
     }
 };
+

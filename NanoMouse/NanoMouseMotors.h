@@ -5,6 +5,14 @@
 #define LEFT_DIRECTION -1
 #define RIGHT_DIRECTION 1
 
+  // NanoMouseMotors motors;
+  //   motors.square();
+  //   motors.move(500, 500);
+  //   motors.delay(1000);
+  //   motors.move(0, 500);
+  //   motors.delay(1700);
+  //   motors.spiral();
+  
 class NanoMouseMotors
 {
   private:
@@ -113,3 +121,4 @@ class NanoMouseMotors
     }
 
 };
+

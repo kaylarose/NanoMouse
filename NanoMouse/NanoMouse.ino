@@ -13,7 +13,7 @@ const byte BUTTON_PIN = 9;
 
 CommonUtils utils;
 NanoMouseMotors motors;
-NanoMouseSensors<A6, A7, A5> sensors;
+NanoMouseSensors sensors(A6, 3, A7, 4, A5, 2);
 
 /////
 // Program Control via Switch
@@ -41,6 +41,8 @@ void setup() {
 
   //motors.attach(LEFT_SERVO_PIN, RIGHT_SERVO_PIN);
 
+  sensors.configure();
+  
   // Uncomment for enabling Blink Test Mode.
   pinMode(LED_BUILTIN, OUTPUT);
 

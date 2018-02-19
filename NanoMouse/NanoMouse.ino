@@ -8,8 +8,7 @@
 ////
 const byte LEFT_SERVO_PIN = 6;
 const byte RIGHT_SERVO_PIN = 5;
-const byte BUTTON_PIN = 9;
-
+const byte BUTTON_PIN = 6; //9;
 
 CommonUtils utils;
 NanoMouseMotors motors;
@@ -86,7 +85,9 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
+    sensors.sense();
     sensors.view();
+
     // delay(100);
   } else {
     // Waiting for program to start...

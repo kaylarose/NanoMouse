@@ -20,7 +20,7 @@ class NanoMouseMotors
     Servo leftServo;
     Servo rightServo;
 
-    static const byte  SERVO_POWER_LEVEL = 500; // 500 is max? See https://mbbackus.bitbucket.io/ "movement"section comments
+    static const byte  SERVO_POWER_LEVEL = 250; // 500 is max See https://mbbackus.bitbucket.io/ "movement"section comments
 
   public:
     void attach(byte leftMotor, byte rightMotor) {
@@ -99,6 +99,20 @@ class NanoMouseMotors
         //   delay(1700);
       }
       DPRINTLN("Completed spiralare...");
+    }
+
+    void forwardProportionalControl(int pathDeviationErrorTerm) {
+      // Proportional Control. Will account for any wandering of the robot off a straight course,
+      // due to servo calibration, terrain differences, etc. It will adjust the power of the individual servos,
+      // to account for any directional error, and over/under-power at different levels in order to 
+      // enable them drive a straight course, by turning back on course until the error rate is zero again.
+      // NOTE: In order for this to work, the motors CANNOT start at 100% power, because you can never add more.
+      // https://www.youtube.com/watch?v=yRb_37vzOd0&feature=youtu.be 
+      // error = sensors.right = sensors.left
+      // leftServoPower = 50% + error
+      // rightServoPower = 50% - error
+      leftServo.writeMicroseconds(1500 - SERVO_POWER_LEVEL - pathDeviationErrorTerm);
+      rightServo.writeMicroseconds(1500 + SERVO_POWER_LEVEL - pathDeviationErrorTerm);
     }
 
 };

@@ -38,24 +38,17 @@ const unsigned long DEBOUNCE_DELAY_TIME = 100;
 
 
 void setup() {
-  // TODO move to debug utils
   Serial.begin(9600);
 
   sensors.configure();
   
-  // Uncomment for enabling Blink Test Mode.
   pinMode(LED_BUILTIN, OUTPUT);
   pinMode(LEFT_LED_PIN, OUTPUT);
   pinMode(RIGHT_LED_PIN, OUTPUT);
   pinMode(FRONT_LED_PIN, OUTPUT);
 
-  // Enables movement (must rewatch video)
-  // Starts the Robot
+  // Button to Start the Robot Lifecycle
   pinMode(BUTTON_PIN, INPUT_PULLUP);
-
-//  while (digitalRead(BUTTON_PIN)) {
-//   // no-op
-//  }
 }
 
 byte state() {
@@ -168,28 +161,12 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
-    //  while (Serial.available()) {
-//    char inChar = (char)Serial.read();
-//    switch(inChar) {
-//      case '1':
-//        digitalWrite(LED_BUILTIN, HIGH);
-//      break;
-//      case '0':
-//        digitalWrite(LED_BUILTIN, LOW);
-//      break;
-//    }
-//    Serial.println(inChar);
-//  }
-
     avoid(state());
-
-    // delay(100);
   } else {
     motors.stop();
     // Waiting for program to start...
     // No-Op (uncomment line below to debug)
     // DPRINTLN(".");
-    // delay(100);
   }
   previousState = switchState;
   

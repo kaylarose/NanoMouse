@@ -4,6 +4,7 @@
 
 #define LEFT_DIRECTION -1
 #define RIGHT_DIRECTION 1
+#define KAYLAS_SERVO_AND_RIGHT_SERVO_ARE_BORKED 0 
 
   // NanoMouseMotors motors;
   //   motors.square();
@@ -19,7 +20,7 @@ class NanoMouseMotors
     Servo leftServo;
     Servo rightServo;
 
-    static const byte  SERVO_POWER_LEVEL = 200; // 200 is max
+    static const byte  SERVO_POWER_LEVEL = 500; // 500 is max? See https://mbbackus.bitbucket.io/ "movement"section comments
 
   public:
     void attach(byte leftMotor, byte rightMotor) {
@@ -27,27 +28,14 @@ class NanoMouseMotors
       leftServo.attach(leftMotor);
       rightServo.attach(rightMotor);
     }
-    //void stop(int time= 200) {
-    //  DPRINTLN("Stopping...");
-    //  // Sends "Stop" Pulse in 1500 Microseconds
-    //  leftServo.writeMicroseconds(1500);
-    //  rightServo.writeMicroseconds(1500);
-    //  delay(time);
-    //  DPRINTLN("Stopped with time...");
-    //}
-
 
     void stop() {
-      DPRINTLN("Stopping...");
       // Sends "Stop" Pulse in 1500 Microseconds
       leftServo.writeMicroseconds(1500);
       rightServo.writeMicroseconds(1500);
-      DPRINTLN("Stopped with time...");
     }
 
-
     void forward() {
-      DPRINTLN("Moving Forward...");
       leftServo.writeMicroseconds(1500 - SERVO_POWER_LEVEL);
       // Inverse power because the servo motor is a different orientation
       // Protip: seems to only apply to parallax motors. Kit motors are pre-calibrated
@@ -58,20 +46,16 @@ class NanoMouseMotors
       rightServo.writeMicroseconds(1500 + SERVO_POWER_LEVEL);
       // TODO This sounds wrong Kayla but it's working that way. Double check.
       // rightServo.writeMicroseconds(1500+SERVO_POWER_LEVEL);
-      DPRINTLN("Moved Forward...");
     }
 
     void forwardTime(unsigned int time) {
-      DPRINTLN("Moving Forward with time...");
       forward();
       delay(time);
       stop();
-      DPRINTLN("Moved Forward with time...");
     }
 
 
     void turn(int direction, int degrees) {
-      DPRINTLN("Turning..." + degrees);
       // Because we are using an normal int here, the value is max 32 sec (-32k/+32k),
       // so if we give multiplier directional args (-1/1) the bot should know hich way to turn.
       leftServo.writeMicroseconds(1500 + SERVO_POWER_LEVEL * direction);
@@ -83,18 +67,15 @@ class NanoMouseMotors
         delay(degrees * 5.9);
       }
       stop();
-      DPRINTLN("Turned..." + degrees);
     }
 
 
 
     void move(int leftMotor, int rightMotor) {
-      DPRINTLN((String)"Moving..." + "L:" + leftMotor + " " + "R:" + rightMotor);
       // Because we are using an normal int here, the value is max 32 sec (-32k/+32k),
       // so if we give multiplier directional args (-1/1) the bot should know hich way to turn.
       leftServo.writeMicroseconds(1500 - leftMotor);
       rightServo.writeMicroseconds(1500 + rightMotor);
-      DPRINTLN((String)"Moved..." + "L:" + leftMotor + " " + "R:" + rightMotor);
     }
 
     void square() {

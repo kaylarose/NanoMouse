@@ -24,7 +24,7 @@ class NanoMouseSensors {
     int rightCombined;
     int rightReflected;
 
-    const static byte NUM_SMOOTHING_READINGS = 20;
+    const static byte NUM_SMOOTHING_READINGS = 10;
     byte smoothingIndex;
     int frontTotal;
     int frontReadings[NUM_SMOOTHING_READINGS];
@@ -36,6 +36,9 @@ class NanoMouseSensors {
     int rightReadings[NUM_SMOOTHING_READINGS];
     int rightSmoothed;
   public:
+    int front;
+    int left;
+    int right;
     NanoMouseSensors(byte frontDetectorPin, 
                      byte frontEmitterPin, 
                      byte leftDetectorPin,
@@ -110,11 +113,25 @@ class NanoMouseSensors {
        frontSmoothed = frontTotal/NUM_SMOOTHING_READINGS;
        leftSmoothed = leftTotal/NUM_SMOOTHING_READINGS;
        rightSmoothed = rightTotal/NUM_SMOOTHING_READINGS;
+
+       front = frontSmoothed;
+       left = leftSmoothed;
+       right = rightSmoothed;
     }
     
     void view() {
-      Log::println("L: ", leftSmoothed, "\t",
-                   "F: ", frontSmoothed, "\t",
-                   "R: ", rightSmoothed);
+      Log::println("L: ", left, "\t",
+                   "F: ", front, "\t",
+                   "R: ", right);
+    }
+
+    void reinitialize() {
+      // Flood the smoothing array with new values
+      // should be used after making a turn or movement,
+      // so that values pre-move are not averaged with those POST-move.
+    
+       for (byte i = 0; i < NUM_SMOOTHING_READINGS; i++) {
+          sense();
+       }
     }
 };

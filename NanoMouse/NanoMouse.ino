@@ -6,9 +6,12 @@
 ////
 // PINS
 ////
-const byte LEFT_SERVO_PIN = 6;
-const byte RIGHT_SERVO_PIN = 5;
-const byte BUTTON_PIN = 6; //9;
+const byte LEFT_SERVO_PIN = 8;
+const byte RIGHT_SERVO_PIN = 7;
+const byte BUTTON_PIN = 6;
+const byte LEFT_LED_PIN = 5;
+const byte RIGHT_LED_PIN = 9;
+const byte FRONT_LED_PIN = 10;
 
 CommonUtils utils;
 NanoMouseMotors motors;
@@ -38,12 +41,13 @@ void setup() {
   // TODO move to debug utils
   Serial.begin(9600);
 
-  //motors.attach(LEFT_SERVO_PIN, RIGHT_SERVO_PIN);
-
   sensors.configure();
   
   // Uncomment for enabling Blink Test Mode.
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LEFT_LED_PIN, OUTPUT);
+  pinMode(RIGHT_LED_PIN, OUTPUT);
+  pinMode(FRONT_LED_PIN, OUTPUT);
 
   // Enables movement (must rewatch video)
   // Starts the Robot
@@ -52,6 +56,70 @@ void setup() {
 //  while (digitalRead(BUTTON_PIN)) {
 //   // no-op
 //  }
+}
+
+byte state() {
+  byte threshold = 30;
+  byte event = 0;
+  sensors.sense();
+
+  // 1 = Front
+  // 2 = Left
+  // 3 = Front and Left
+  // 4 = Right
+  // 5 = Front and Right
+  // 6 = Right and Left
+  // 7 = Front, Left, and Right
+  if (sensors.front > threshold) {
+    event += 1;
+  }
+
+  if (sensors.left > threshold) {
+    event += 2;
+  }
+
+  if (sensors.right > threshold) {
+    event += 4;
+  }
+
+  return event;
+}
+
+void avoid(byte event) {
+  digitalWrite(LEFT_LED_PIN, LOW);
+  digitalWrite(RIGHT_LED_PIN, LOW);
+  digitalWrite(FRONT_LED_PIN, LOW);
+  switch(event) {
+      case 1:
+        Log::println("Turn NOW!! Headed directly into obstacle");
+        digitalWrite(LEFT_LED_PIN, HIGH);
+        digitalWrite(FRONT_LED_PIN, HIGH);
+        motors.turn(LEFT_SERVO_PIN, 90);
+        sensors.reinitialize();
+        break;
+      case 2:
+        Log::println("Turn Right.");
+        digitalWrite(LEFT_LED_PIN, LOW);
+        digitalWrite(RIGHT_LED_PIN, HIGH);
+        motors.turn(RIGHT_SERVO_PIN, 45);
+        sensors.reinitialize();
+        break;
+      case 4:
+        Log::println("Turn Left.");
+        digitalWrite(LEFT_LED_PIN, HIGH);
+        digitalWrite(RIGHT_LED_PIN, LOW);
+        motors.turn(LEFT_SERVO_PIN, 45);
+        sensors.reinitialize();
+        break;
+      default:
+        digitalWrite(LEFT_LED_PIN, LOW);
+        digitalWrite(RIGHT_LED_PIN, LOW);
+        digitalWrite(FRONT_LED_PIN, HIGH);
+        Log::println(".");
+        motors.forward();
+        sensors.reinitialize();
+        break;
+  }
 }
 
 void loop() {
@@ -68,13 +136,14 @@ void loop() {
       currentState = LOW;
       isRunning = false;
       DPRINTLN("End Program...");
-      
+      motors.stop();
       // Do any other "teardown" type stuff when the button is toggled OFF here.
       
     } else {
       currentState = HIGH;
       isRunning = true;
       DPRINTLN("Begin Program...");
+      motors.attach(LEFT_SERVO_PIN, RIGHT_SERVO_PIN);
 
       // Do any other "setup" type stuff when the button is toggled ON here.
     }
@@ -85,11 +154,24 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
-    sensors.sense();
-    sensors.view();
+    //  while (Serial.available()) {
+//    char inChar = (char)Serial.read();
+//    switch(inChar) {
+//      case '1':
+//        digitalWrite(LED_BUILTIN, HIGH);
+//      break;
+//      case '0':
+//        digitalWrite(LED_BUILTIN, LOW);
+//      break;
+//    }
+//    Serial.println(inChar);
+//  }
+
+    avoid(state());
 
     // delay(100);
   } else {
+    motors.stop();
     // Waiting for program to start...
     // No-Op (uncomment line below to debug)
     // DPRINTLN(".");
@@ -104,4 +186,5 @@ void loop() {
 
   delay(100);
 }
+
 

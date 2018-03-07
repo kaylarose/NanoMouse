@@ -89,26 +89,40 @@ void avoid(byte event) {
   digitalWrite(LEFT_LED_PIN, LOW);
   digitalWrite(RIGHT_LED_PIN, LOW);
   digitalWrite(FRONT_LED_PIN, LOW);
+  // Randomize "Sharp-Turn" and "Turn" to prevent weird repeat behavior if stuck, boring behavior, etc.
+  // C++note: MUST init these variables outside the switch statement due to how variable assignment works,
+  // OR, if this gets to be a PITA, just make each case a real block. https://stackoverflow.com/questions/12992108/crosses-initialization-of-variable-only-when-initialization-combined-with-decl
+  int sharpTurnDegrees = random(90,181); // Between 90-181 (max) degrees
+  int sharpTurnIsLeftDirection = random(2); // 0: Right, 1: Left
+  int turnDegrees = random(30, 61);
   switch(event) {
       case 1:
-        Log::println("Turn NOW!! Headed directly into obstacle");
-        digitalWrite(LEFT_LED_PIN, HIGH);
-        digitalWrite(FRONT_LED_PIN, HIGH);
-        motors.turn(LEFT_SERVO_PIN, 90);
+        Log::print("Sharp Turn NOW!! Headed directly into obstacle...");
+
+        if (sharpTurnIsLeftDirection) {
+          Log::println("Sharp Turn: Left");
+          digitalWrite(FRONT_LED_PIN, HIGH);
+          motors.turn(LEFT_SERVO_PIN, sharpTurnDegrees);
+        } else {
+          Log::println("Sharp Turn: Right");
+          digitalWrite(RIGHT_LED_PIN, HIGH);
+          digitalWrite(FRONT_LED_PIN, HIGH);
+          motors.turn(RIGHT_SERVO_PIN, sharpTurnDegrees);
+        }
         sensors.reinitialize();
         break;
       case 2:
         Log::println("Turn Right.");
         digitalWrite(LEFT_LED_PIN, LOW);
         digitalWrite(RIGHT_LED_PIN, HIGH);
-        motors.turn(RIGHT_SERVO_PIN, 45);
+        motors.turn(RIGHT_SERVO_PIN, turnDegrees);
         sensors.reinitialize();
         break;
       case 4:
         Log::println("Turn Left.");
         digitalWrite(LEFT_LED_PIN, HIGH);
         digitalWrite(RIGHT_LED_PIN, LOW);
-        motors.turn(LEFT_SERVO_PIN, 45);
+        motors.turn(LEFT_SERVO_PIN, turnDegrees);
         sensors.reinitialize();
         break;
       default:

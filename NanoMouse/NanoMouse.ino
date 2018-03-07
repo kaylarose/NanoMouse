@@ -9,8 +9,8 @@
 const byte LEFT_SERVO_PIN = 8;
 const byte RIGHT_SERVO_PIN = 7;
 const byte BUTTON_PIN = 6;
-const byte LEFT_LED_PIN = 5;
-const byte RIGHT_LED_PIN = 9;
+const byte LEFT_LED_PIN = 9;
+const byte RIGHT_LED_PIN = 5;
 const byte FRONT_LED_PIN = 10;
 
 CommonUtils utils;
@@ -94,6 +94,7 @@ void avoid(byte event) {
 
         if (sharpTurnIsLeftDirection) {
           Log::println("Sharp Turn: Left");
+          digitalWrite(LEFT_LED_PIN, HIGH);
           digitalWrite(FRONT_LED_PIN, HIGH);
           motors.turn(LEFT_SERVO_PIN, sharpTurnDegrees);
         } else {
@@ -161,9 +162,14 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
+    //sensors.sense();
+    //motors.forwardProportionalControl(sensors.right - sensors.left);
     avoid(state());
   } else {
     motors.stop();
+    digitalWrite(LEFT_LED_PIN, LOW);
+    digitalWrite(RIGHT_LED_PIN, LOW);
+    digitalWrite(FRONT_LED_PIN, LOW);
     // Waiting for program to start...
     // No-Op (uncomment line below to debug)
     // DPRINTLN(".");

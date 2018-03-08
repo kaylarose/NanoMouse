@@ -39,7 +39,7 @@ const unsigned long DEBOUNCE_DELAY_TIME = 100;
 
 void setup() {
   Serial.begin(9600);
-
+  DPRINTLN("Start Robot");
   sensors.configure();
   
   pinMode(LED_BUILTIN, OUTPUT);
@@ -133,7 +133,6 @@ void avoid(byte event) {
 void loop() {
   // Read in the actual switch state
   switchState = digitalRead(BUTTON_PIN);
-  
   // Compare the Current and Previous PROGRAM states to the actual SWITCH (Button) State,
   // BUT.... wait a certain ammount of time in between toggling the switch, because
   // the board will register it as multiple button presses, sometimes.
@@ -162,9 +161,9 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
-    //sensors.sense();
-    //motors.forwardProportionalControl(sensors.right - sensors.left);
-    avoid(state());
+    sensors.sense();
+    motors.forwardProportionalControl(sensors.right - sensors.left);
+    //avoid(state());
   } else {
     motors.stop();
     digitalWrite(LEFT_LED_PIN, LOW);

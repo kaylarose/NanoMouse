@@ -111,8 +111,9 @@ class NanoMouseMotors
       // error = sensors.right = sensors.left
       // leftServoPower = 50% + error
       // rightServoPower = 50% - error
-      leftServo.writeMicroseconds(1500 - SERVO_POWER_LEVEL - pathDeviationErrorTerm);
-      rightServo.writeMicroseconds(1500 + SERVO_POWER_LEVEL - pathDeviationErrorTerm);
+      // NOTE: My sensors are not parallax (as used in video), so need to add the error term instead of subtract
+      leftServo.writeMicroseconds(1500 - SERVO_POWER_LEVEL + pathDeviationErrorTerm);
+      rightServo.writeMicroseconds(1500 + SERVO_POWER_LEVEL + pathDeviationErrorTerm);
     }
 
 };

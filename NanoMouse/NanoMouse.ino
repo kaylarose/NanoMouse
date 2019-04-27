@@ -6,10 +6,12 @@
 ////
 // PINS
 ////
-const byte LEFT_SERVO_PIN = 6;
-const byte RIGHT_SERVO_PIN = 5;
-const byte BUTTON_PIN = 9;
-
+const byte LEFT_SERVO_PIN = 8;
+const byte RIGHT_SERVO_PIN = 7;
+const byte BUTTON_PIN = 6;
+const byte LEFT_LED_PIN = 9;
+const byte RIGHT_LED_PIN = 5;
+const byte FRONT_LED_PIN = 10;
 
 CommonUtils utils;
 NanoMouseMotors motors;
@@ -36,29 +38,101 @@ const unsigned long DEBOUNCE_DELAY_TIME = 100;
 
 
 void setup() {
-  // TODO move to debug utils
   Serial.begin(9600);
-
-  //motors.attach(LEFT_SERVO_PIN, RIGHT_SERVO_PIN);
-
+  DPRINTLN("Start Robot");
   sensors.configure();
   
-  // Uncomment for enabling Blink Test Mode.
   pinMode(LED_BUILTIN, OUTPUT);
+  pinMode(LEFT_LED_PIN, OUTPUT);
+  pinMode(RIGHT_LED_PIN, OUTPUT);
+  pinMode(FRONT_LED_PIN, OUTPUT);
 
-  // Enables movement (must rewatch video)
-  // Starts the Robot
+  // Button to Start the Robot Lifecycle
   pinMode(BUTTON_PIN, INPUT_PULLUP);
+}
 
-//  while (digitalRead(BUTTON_PIN)) {
-//   // no-op
-//  }
+byte state() {
+  byte threshold = 30;
+  byte event = 0;
+  sensors.sense();
+
+  // 1 = Front
+  // 2 = Left
+  // 3 = Front and Left
+  // 4 = Right
+  // 5 = Front and Right
+  // 6 = Right and Left
+  // 7 = Front, Left, and Right
+  if (sensors.front > threshold) {
+    event += 1;
+  }
+
+  if (sensors.left > threshold) {
+    event += 2;
+  }
+
+  if (sensors.right > threshold) {
+    event += 4;
+  }
+
+  return event;
+}
+
+void avoid(byte event) {
+  digitalWrite(LEFT_LED_PIN, LOW);
+  digitalWrite(RIGHT_LED_PIN, LOW);
+  digitalWrite(FRONT_LED_PIN, LOW);
+  // Randomize "Sharp-Turn" and "Turn" to prevent weird repeat behavior if stuck, boring behavior, etc.
+  // C++note: MUST init these variables outside the switch statement due to how variable assignment works,
+  // OR, if this gets to be a PITA, just make each case a real block. https://stackoverflow.com/questions/12992108/crosses-initialization-of-variable-only-when-initialization-combined-with-decl
+  int sharpTurnDegrees = random(90,181); // Between 90-181 (max) degrees
+  int sharpTurnIsLeftDirection = random(2); // 0: Right, 1: Left
+  int turnDegrees = random(30, 61);
+  switch(event) {
+      case 1:
+        Log::print("Sharp Turn NOW!! Headed directly into obstacle...");
+
+        if (sharpTurnIsLeftDirection) {
+          Log::println("Sharp Turn: Left");
+          digitalWrite(LEFT_LED_PIN, HIGH);
+          digitalWrite(FRONT_LED_PIN, HIGH);
+          motors.turn(LEFT_SERVO_PIN, sharpTurnDegrees);
+        } else {
+          Log::println("Sharp Turn: Right");
+          digitalWrite(RIGHT_LED_PIN, HIGH);
+          digitalWrite(FRONT_LED_PIN, HIGH);
+          motors.turn(RIGHT_SERVO_PIN, sharpTurnDegrees);
+        }
+        sensors.reinitialize();
+        break;
+      case 2:
+        Log::println("Turn Right.");
+        digitalWrite(LEFT_LED_PIN, LOW);
+        digitalWrite(RIGHT_LED_PIN, HIGH);
+        motors.turn(RIGHT_SERVO_PIN, turnDegrees);
+        sensors.reinitialize();
+        break;
+      case 4:
+        Log::println("Turn Left.");
+        digitalWrite(LEFT_LED_PIN, HIGH);
+        digitalWrite(RIGHT_LED_PIN, LOW);
+        motors.turn(LEFT_SERVO_PIN, turnDegrees);
+        sensors.reinitialize();
+        break;
+      default:
+        digitalWrite(LEFT_LED_PIN, LOW);
+        digitalWrite(RIGHT_LED_PIN, LOW);
+        digitalWrite(FRONT_LED_PIN, HIGH);
+        Log::println(".");
+        motors.forward();
+        sensors.reinitialize();
+        break;
+  }
 }
 
 void loop() {
   // Read in the actual switch state
   switchState = digitalRead(BUTTON_PIN);
-  
   // Compare the Current and Previous PROGRAM states to the actual SWITCH (Button) State,
   // BUT.... wait a certain ammount of time in between toggling the switch, because
   // the board will register it as multiple button presses, sometimes.
@@ -69,13 +143,14 @@ void loop() {
       currentState = LOW;
       isRunning = false;
       DPRINTLN("End Program...");
-      
+      motors.stop();
       // Do any other "teardown" type stuff when the button is toggled OFF here.
       
     } else {
       currentState = HIGH;
       isRunning = true;
       DPRINTLN("Begin Program...");
+      motors.attach(LEFT_SERVO_PIN, RIGHT_SERVO_PIN);
 
       // Do any other "setup" type stuff when the button is toggled ON here.
     }
@@ -86,13 +161,17 @@ void loop() {
 
   if (currentState == HIGH) {
     // Program Running...
-    sensors.view();
-    // delay(100);
+    sensors.sense();
+    motors.forwardProportionalControl(sensors.right - sensors.left);
+    //avoid(state());
   } else {
+    motors.stop();
+    digitalWrite(LEFT_LED_PIN, LOW);
+    digitalWrite(RIGHT_LED_PIN, LOW);
+    digitalWrite(FRONT_LED_PIN, LOW);
     // Waiting for program to start...
     // No-Op (uncomment line below to debug)
     // DPRINTLN(".");
-    // delay(100);
   }
   previousState = switchState;
   
@@ -103,4 +182,5 @@ void loop() {
 
   delay(100);
 }
+
 
